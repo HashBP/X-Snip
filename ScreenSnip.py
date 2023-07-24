@@ -18,6 +18,9 @@ import numpy as np
 import mss
 import ctypes
 import requests
+import pyperclip
+
+
 print("Eventually this window won't be here")
 '''
     IMPORTS
@@ -318,21 +321,24 @@ class outputWindowWidget(QMainWindow):
                 "Unknown error: %s\n\nTry uninstalling and reinstalling this program." % str(err))
         elif status == OCRSTATUS_FINISH:
             text = data
-            question = data
-            url = "https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=AIzaSyB_n8UweZNjEhc1kK2ETTf2EKnRw-M_hHI"
-            data = {"prompt": {"text": text}}
-            response = requests.post(url, json=data).json()
+            if(len(text)):
+                question = data
+                pyperclip.copy(text)
+                spam = pyperclip.paste()
+                url = "https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=AIzaSyB_n8UweZNjEhc1kK2ETTf2EKnRw-M_hHI"
+                data = {"prompt": {"text": text}}
+                response = requests.post(url, json=data).json()
 
-            text = "Your response: \n\n" + \
-                response["candidates"][0]["output"] + \
-                "\n\n\n\n"+"Your Search:\n\n"+question
+                # text = "Your Search:\n\n"+question+"\n\n\n\n"+"Your response: \n\n" + \
+                #     response["candidates"][0]["output"]
 
-            # text = response["candidates"][0]["output"]
-
+                text = response["candidates"][0]["output"]
+            else:
+                text = "No Text Found!!"
             self.statusLabel.setText(
-                "Scan completed! Found %d characters" % len(text))
+                    "Scan completed! Found %d characters" % len(text))
             self.ocrResult.setPlaceholderText(
-                "Scan complete! If you're seeing this, then there was nothing found.")
+                    "Scan complete! If you're seeing this, then there was nothing found.")
             self.ocrResult.setPlainText(text)
 
     def kill(self):
